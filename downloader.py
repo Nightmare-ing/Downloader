@@ -7,6 +7,7 @@ from PyQt5.QtCore import QUrl  # Import QUrl
 from PyQt5.QtCore import pyqtSignal
 import os
 import csv
+import shutil
 
 class BrowserWindow(QWebEngineView):
     cookies_ready = pyqtSignal(dict)  # Signal to notify when cookies are ready
@@ -70,6 +71,8 @@ def download_files(cookie_jar):
                 else:
                     print(f"Failed to download {filename}: {response.status_code}")
 
+    # Create a zip file of the downloaded files
+    shutil.make_archive(download_dir, 'zip', download_dir)
 
 def main():
     app = QApplication(sys.argv)
