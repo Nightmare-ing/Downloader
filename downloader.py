@@ -42,6 +42,9 @@ class BrowserWindow(QWebEngineView):
         response = requests.get(protected_url, cookies=cookie_jar)
         if response.status_code == 200:
             print("Download protected data successfully.")
+            with open("EECS151-master.zip", "wb") as f:
+                f.write(response.content)
+            print("Protected data saved as 'EECS151-master.zip'")
         else:
             print(f"Failed to download protected data {response.status_code}")
 
