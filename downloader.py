@@ -5,6 +5,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWebEngineWidgets import QWebEngineProfile
 from PyQt5.QtCore import QUrl  # Import QUrl
 from PyQt5.QtCore import pyqtSignal
+import os
+import csv
 
 class BrowserWindow(QWebEngineView):
     cookies_ready = pyqtSignal(dict)  # Signal to notify when cookies are ready
@@ -43,16 +45,31 @@ def handle_cookies(cookies):
     cookie_jar = {}
     for name, value in cookies.items():
         cookie_jar[name] = value
+    download_files(cookie_jar)  # Call the download function with the cookies
 
-    protected_url = "https://github.com/Nightmare-ing/EECS151-Fa20/archive/refs/heads/master.zip"
-    response = requests.get(protected_url, cookies=cookie_jar)
-    if response.status_code == 200:
-        print("Download protected data successfully.")
-        with open("EECS151-master.zip", "wb") as f:
-            f.write(response.content)
-        print("Protected data saved as 'EECS151-master.zip'")
-    else:
-        print(f"Failed to download protected data {response.status_code}")
+def download_files(cookie_jar):
+    """
+    Download files using the cookies received from the browser.
+    """
+    download_dir = "outputs"
+    os.makedirs(download_dir, exist_ok=True)  # Create download directory if it doesn't exist
+    
+    with open("links.csv", "r", newline='') as links_file:
+        reader = csv.reader(links_file)
+        for row in reader:
+            filename = row[0]
+            download_link = row[1]
+            print(f"Processing {filename} with link {download_link}")
+            if filename and download_link:
+                response = requests.get(download_link, cookies=cookie_jar)
+                if response.status_code == 200:
+                    target = os.path.join(download_dir, os.path.basename(filename))
+                    with open(target, "wb") as f:
+                        f.write(response.content)
+                    print(f"Downloaded {filename}")
+                else:
+                    print(f"Failed to download {filename}: {response.status_code}")
+
 
 def main():
     app = QApplication(sys.argv)
