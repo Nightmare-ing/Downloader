@@ -7,6 +7,8 @@ import csv
 import requests
 import shutil
 import argparse
+import time
+import random
 
 
 def main():
@@ -60,7 +62,13 @@ def download_with_cookies(cookies, links_file):
                 else:
                     print(f"Failed to download {target_name}: {response.status_code}")
 
+                # Add a random delay between 1 and 5 seconds
+                delay = random.uniform(1, 5)
+                print(f"Waiting for {delay:.2f} seconds before the next request...")
+                time.sleep(delay)
+
     # Create a zip file of the downloaded files
+    print("Finish Downloading All the Files! Creating a zip file...")
     shutil.make_archive(download_dir, 'zip', download_dir)
     print("Thank you for downloading the files! Have a great day!")
 
