@@ -9,7 +9,7 @@ import shutil
 import argparse
 import time
 import random
-from colorama import Fore, Style, init  # Import colorama
+from colorama import Fore, init  # Import colorama
 import logging  # Import logging module
 
 
@@ -67,6 +67,7 @@ def download_with_cookies(cookies, links_file):
     
     with open(links_file, "r", newline='') as links_file:
         reader = csv.reader(links_file)
+        next(reader, None)  # Skip the header row
         for row in reader:
             target_name = row[0]
             target_link = row[1]
