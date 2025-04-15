@@ -15,8 +15,14 @@ pip install -r requirements.txt
 
 ## Run the Script
 
-Run with the command as following, replace `<login url>` with your desired URL.
+Run with the command in the verbose form as following, replace `<login url>` with your desired URL, and replace `<links.csv>` with the directory to the file which contain links.
 
 ```shell
-(.venv)$ python3 download.py <login url>
+(.venv)$ python3 download.py --file <links.csv> --url <login url>
+```
+
+Or you can run in the non-verbose form
+
+```shell
+(.venv)$ python3 download.py -f <links.csv> -u <login url>
 ```
