@@ -6,16 +6,17 @@ import os
 import csv
 import requests
 import shutil
+import argparse
 
 
-def download_with_cookies(cookies):
+def download_with_cookies(cookies, links_file):
     """
     Use cookies to download protected data.
     """
     download_dir = "outputs"
     os.makedirs(download_dir, exist_ok=True)
     
-    with open("links.csv", "r", newline='') as links_file:
+    with open(links_file, "r", newline='') as links_file:
         reader = csv.reader(links_file)
         for row in reader:
             target_name = row[0]
@@ -37,16 +38,22 @@ def download_with_cookies(cookies):
     print("Thank you for downloading the files! Have a great day!")
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python download.py <login_url>")
+    if len(sys.argv) < 5:
+        print("Usage: python download.py --file <links.csv> --url <login_url>")
         sys.exit(1)
     
+    parser = argparse.ArgumentParser(description="Download files using cookies.")
+    parser.add_argument('-f', '--file', type=str, required=True, help='Path to the CSV file containing links.')
+    parser.add_argument('-u', '--url', type=str, required=True, help='Login URL for authentication.')
+    
+    args = parser.parse_args()
     QCoreApplication.setApplicationName("Link Downloader")
     app = QApplication(sys.argv)
-    login_url = sys.argv[1]  # Get the login URL from command line arguments
+    login_url = args.url  # Get the login URL from command line arguments
+    links_file = args.file # Get the file containing links from command line arguments
     browser = BrowserWindow(login_url)
     browser.show()
-    browser.cookies_ready.connect(download_with_cookies)  # Connect the signal to the handler
+    browser.cookies_ready.connect(lambda cookies: download_with_cookies(cookies, links_file))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
