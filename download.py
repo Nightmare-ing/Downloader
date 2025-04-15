@@ -9,6 +9,33 @@ import shutil
 import argparse
 
 
+def main():
+    args = parse_args()
+    QCoreApplication.setApplicationName("Link Downloader")
+    app = QApplication(sys.argv)
+    login_url = args.url  # Get the login URL from command line arguments
+    links_file = args.file # Get the file containing links from command line arguments
+    browser = BrowserWindow(login_url)
+    browser.show()
+
+    browser.cookies_ready.connect(lambda cookies: download_with_cookies(cookies, links_file))  # Connect the signal to the handler
+    sys.exit(app.exec_())
+
+
+def parse_args():
+    """
+    Parse command line arguments.
+    """
+    if len(sys.argv) < 5:
+        print("Usage: python download.py --file <links.csv> --url <login_url>")
+        sys.exit(1)
+    
+    parser = argparse.ArgumentParser(description="Download files using cookies.")
+    parser.add_argument('-f', '--file', type=str, required=True, help='Path to the CSV file containing links.')
+    parser.add_argument('-u', '--url', type=str, required=True, help='Login URL for authentication.')
+    return parser.parse_args()
+    
+
 def download_with_cookies(cookies, links_file):
     """
     Use cookies to download protected data.
@@ -37,24 +64,6 @@ def download_with_cookies(cookies, links_file):
     shutil.make_archive(download_dir, 'zip', download_dir)
     print("Thank you for downloading the files! Have a great day!")
 
-def main():
-    if len(sys.argv) < 5:
-        print("Usage: python download.py --file <links.csv> --url <login_url>")
-        sys.exit(1)
-    
-    parser = argparse.ArgumentParser(description="Download files using cookies.")
-    parser.add_argument('-f', '--file', type=str, required=True, help='Path to the CSV file containing links.')
-    parser.add_argument('-u', '--url', type=str, required=True, help='Login URL for authentication.')
-    
-    args = parser.parse_args()
-    QCoreApplication.setApplicationName("Link Downloader")
-    app = QApplication(sys.argv)
-    login_url = args.url  # Get the login URL from command line arguments
-    links_file = args.file # Get the file containing links from command line arguments
-    browser = BrowserWindow(login_url)
-    browser.show()
-    browser.cookies_ready.connect(lambda cookies: download_with_cookies(cookies, links_file))  # Connect the signal to the handler
-    sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
