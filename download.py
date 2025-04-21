@@ -33,6 +33,7 @@ def setup_logging():
     Set up logging to log messages to both a file and the console.
     """
     log_file = "outputs/download.log"
+    os.makedirs(os.path.dirname(log_file), exist_ok=True) # create the file if not exist
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
