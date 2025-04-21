@@ -1,6 +1,8 @@
+import sys
 import os
 from urllib.parse import urlparse
 import csv  # Import CSV module
+import argparse
 
 def extract_file_name(url):
     """
@@ -10,12 +12,21 @@ def extract_file_name(url):
     return os.path.basename(parsed_url.path)
 
 def main():
-    input_file = "inputs/links"
-    output_csv = "inputs/links.csv"
-    os.makedirs(os.path.dirname(output_csv), exist_ok=True)  # Ensure output directory exists
+    input_file = "inputs/links.src"
+    output_dir = "inputs"
+    gen_csv_with_links(input_file, output_dir)
+            
 
-    with open(input_file, "r") as file, open(output_csv, "w", newline="") as csv_file:
-        lines = file.readlines()
+def gen_csv_with_links(links_src, folder):
+    """
+    Generate CSV file with file names and links from the given src file which only contain links
+    """
+    # get the name of the file links_src without extension
+    file_name = os.path.splitext(os.path.basename(links_src))[0] + ".csv"
+    csv_file = os.path.join(folder, file_name)
+    os.makedirs(os.path.dirname(csv_file), exist_ok=True)
+    with open(links_src, "r") as source_file, open(csv_file, "w", newline="") as csv_file:
+        lines = source_file.readlines()
         writer = csv.writer(csv_file)
         writer.writerow(["File Name", "Link"])  # Write CSV header
 
@@ -24,6 +35,7 @@ def main():
             file_name = extract_file_name(url)
             writer.writerow([file_name, url])  # Write file name and link to CSV
             print(f"Added to CSV: {file_name}, {url}")
+
 
 if __name__ == "__main__":
     main()
