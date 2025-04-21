@@ -24,7 +24,7 @@ def main():
     browser = BrowserWindow(login_url)
     browser.show()
 
-    browser.cookies_ready.connect(lambda cookies: download_with_cookies(cookies, links_file))  # Connect the signal to the handler
+    browser.cookies_ready.connect(lambda cookies: download_with_cookies_csv(cookies, links_file))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -59,7 +59,7 @@ def parse_args():
     return parser.parse_args()
     
 
-def download_with_cookies(cookies, links_file):
+def download_with_cookies_csv(cookies, links_file):
     """
     Use cookies to download protected data.
     """
@@ -86,11 +86,7 @@ def download_with_cookies(cookies, links_file):
             delay = random.uniform(1, 5)
             logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
             time.sleep(delay)
-
-    # Create a zip file of the downloaded files
-    logging.info(Fore.MAGENTA + "Finish Downloading All the Files! Creating a zip file...")
-    shutil.make_archive(download_dir, 'zip', download_dir)
-    logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!")
+    after_download()
 
 
 def get_name_and_links_from_csv(file_path):
@@ -101,6 +97,15 @@ def get_name_and_links_from_csv(file_path):
         reader = csv.reader(csvfile)
         next(reader, None)  # Skip the header row
         return [(row[0], row[1]) for row in reader if row]
+
+
+def after_download():
+    """
+    Perform any actions needed after the download is complete.
+    """
+    logging.info(Fore.MAGENTA + "Finish Downloading All the Files! Creating a zip file...")
+    shutil.make_archive("outputs", 'zip', "outputs")
+    logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!")
 
 
 if __name__ == '__main__':
