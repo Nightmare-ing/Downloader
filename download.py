@@ -68,6 +68,9 @@ def download_with_csv(cookies, links_file):
     Use cookies to download protected data.
     """
     download_dir = "outputs"
+    # remove the old directory if it exists
+    if os.path.exists(download_dir):
+        shutil.rmtree(download_dir)
     os.makedirs(download_dir, exist_ok=True)
     
     with open(links_file, "r", newline='') as csvfile:
