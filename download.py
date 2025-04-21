@@ -116,22 +116,7 @@ def download_with_cookies_yml(cookies, file_path):
         for pair in group["pairs"]:
             target_name = pair["file name"]
             target_link = pair["link"]
-            logging.info(Fore.CYAN + f"Processing {target_name} with link {target_link}")
-
-            if target_name and target_link:
-                response = requests.get(target_link, cookies=cookies)
-                if response.status_code == 200:
-                    target = os.path.join(sub_dir_path, os.path.basename(target_name))
-                    with open(target, "wb") as f:
-                        f.write(response.content)
-                    logging.info(Fore.GREEN + f"Downloaded {target_name}")
-                else:
-                    logging.error(Fore.RED + f"Failed to download {target_name}: {response.status_code}" )
-                
-                # Add a random delay between 1 and 5 seconds
-                delay = random.uniform(1, 5)
-                logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
-                time.sleep(delay)
+            download(sub_dir_path, target_name, target_link, cookies)
     after_download()
 
 
@@ -142,6 +127,24 @@ def after_download():
     logging.info(Fore.MAGENTA + "Finish Downloading All the Files! Creating a zip file...")
     shutil.make_archive("outputs", 'zip', "outputs")
     logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!")
+
+
+def download(folder, file, link, cookies):
+    logging.info(Fore.CYAN + f"Processing {file} with link {link}")
+    if file and link:
+        response = requests.get(link, cookies=cookies)
+        if response.status_code == 200:
+            target = os.path.join(folder, os.path.basename(file))
+            with open(target, "wb") as f:
+                f.write(response.content)
+            logging.info(Fore.GREEN + f"Downloaded {file}")
+        else:
+            logging.error(Fore.RED + f"Failed to download {file}: {response.status_code}" )
+        
+        # Add a random delay between 1 and 5 seconds
+        delay = random.uniform(1, 5)
+        logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
+        time.sleep(delay)
 
 
 if __name__ == '__main__':
