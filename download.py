@@ -66,33 +66,41 @@ def download_with_cookies(cookies, links_file):
     download_dir = "outputs"
     os.makedirs(download_dir, exist_ok=True)
     
-    with open(links_file, "r", newline='') as links_file:
-        reader = csv.reader(links_file)
-        next(reader, None)  # Skip the header row
-        for row in reader:
-            target_name = row[0]
-            target_link = row[1]
-            logging.info(Fore.CYAN + f"Processing {target_name} with link {target_link}")
+    name_with_links = get_name_and_links_from_csv(links_file)
+    for pair in name_with_links:
+        target_name = pair[0]
+        target_link = pair[1]
+        logging.info(Fore.CYAN + f"Processing {target_name} with link {target_link}")
 
-            if target_name and target_link:
-                response = requests.get(target_link, cookies=cookies)
-                if response.status_code == 200:
-                    target = os.path.join(download_dir, os.path.basename(target_name))
-                    with open(target, "wb") as f:
-                        f.write(response.content)
-                    logging.info(Fore.GREEN + f"Downloaded {target_name}")
-                else:
-                    logging.error(Fore.RED + f"Failed to download {target_name}: {response.status_code}")
+        if target_name and target_link:
+            response = requests.get(target_link, cookies=cookies)
+            if response.status_code == 200:
+                target = os.path.join(download_dir, os.path.basename(target_name))
+                with open(target, "wb") as f:
+                    f.write(response.content)
+                logging.info(Fore.GREEN + f"Downloaded {target_name}")
+            else:
+                logging.error(Fore.RED + f"Failed to download {target_name}: {response.status_code}")
 
-                # Add a random delay between 1 and 5 seconds
-                delay = random.uniform(1, 5)
-                logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
-                time.sleep(delay)
+            # Add a random delay between 1 and 5 seconds
+            delay = random.uniform(1, 5)
+            logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
+            time.sleep(delay)
 
     # Create a zip file of the downloaded files
     logging.info(Fore.MAGENTA + "Finish Downloading All the Files! Creating a zip file...")
     shutil.make_archive(download_dir, 'zip', download_dir)
     logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!")
+
+
+def get_name_and_links_from_csv(file_path):
+    """
+    Read the CSV file and return a list of tuples containing names and links.
+    """
+    with open(file_path, "r", newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        next(reader, None)  # Skip the header row
+        return [(row[0], row[1]) for row in reader if row]
 
 
 if __name__ == '__main__':
