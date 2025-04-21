@@ -100,7 +100,7 @@ def get_name_and_links_from_csv(file_path):
         return [(row[0], row[1]) for row in reader if row]
     
 
-def download_with_cookies_yml(file_path):
+def download_with_cookies_yml(cookies, file_path):
     """
     Use cookies to download protected data from a YAML file.
     """
@@ -110,16 +110,16 @@ def download_with_cookies_yml(file_path):
     download_dir = "outputs"
     os.makedirs(download_dir, exist_ok=True)
 
-    for sub_dir, items in data["Known Links"]:
-        sub_dir_path = os.path.join(download_dir, sub_dir)
+    for group in data["Known Links"]:
+        sub_dir_path = os.path.join(download_dir, group["group name"])
         os.makedirs(sub_dir_path, exist_ok=True)
-        for item in items:
-            target_name = item[0]
-            target_link = item[1]
+        for pair in group["pairs"]:
+            target_name = pair["file name"]
+            target_link = pair["link"]
             logging.info(Fore.CYAN + f"Processing {target_name} with link {target_link}")
 
             if target_name and target_link:
-                response = requests.get(target_link)
+                response = requests.get(target_link, cookies=cookies)
                 if response.status_code == 200:
                     target = os.path.join(sub_dir_path, os.path.basename(target_name))
                     with open(target, "wb") as f:
