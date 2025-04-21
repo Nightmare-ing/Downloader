@@ -17,6 +17,25 @@ def main():
     gen_csv_with_links(input_file, output_dir)
             
 
+def parse_args():
+    """
+    Parse command line arguments.
+    """
+    if len(sys.argv) < 3:
+        print("Usage: python csv-gen.py --file <links.src>")
+        sys.exit(1)
+    
+    # check the extension of the file
+    if not sys.argv[2].endswith(".src"):
+        print("The file must have a .src extension.")
+        sys.exit(1)
+    
+    parser = argparse.ArgumentParser(description="Generate CSV containing file name and links" \
+    "from links in src file")
+    parser.add_argument('-f', '--file', type=str, required=True, help='Path to the SRC file containing links')
+    return parser.parse_args()
+
+
 def gen_csv_with_links(links_src, folder):
     """
     Generate CSV file with file names and links from the given src file which only contain links
