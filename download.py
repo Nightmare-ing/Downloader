@@ -21,11 +21,14 @@ def main():
     QCoreApplication.setApplicationName("Link Downloader")
     app = QApplication(sys.argv)
     login_url = args.url  # Get the login URL from command line arguments
-    links_file = args.file # Get the file containing links from command line arguments
     browser = BrowserWindow(login_url)
     browser.show()
 
-    browser.cookies_ready.connect(lambda cookies: download_with_cookies_yml(cookies, links_file))  # Connect the signal to the handler
+    links_file = args.file # Get the file containing links from command line arguments
+    if links_file.endswith(".csv"):
+        browser.cookies_ready.connect(lambda cookies: download_with_csv(cookies, links_file))
+    elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
+        browser.cookies_ready.connect(lambda cookies: download_with_yml(cookies, links_file))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -60,7 +63,7 @@ def parse_args():
     return parser.parse_args()
     
 
-def download_with_cookies_csv(cookies, links_file):
+def download_with_csv(cookies, links_file):
     """
     Use cookies to download protected data.
     """
@@ -78,7 +81,7 @@ def download_with_cookies_csv(cookies, links_file):
     after_download()
 
 
-def download_with_cookies_yml(cookies, file_path):
+def download_with_yml(cookies, file_path):
     """
     Use cookies to download protected data from a YAML file.
     """
