@@ -11,6 +11,7 @@ import time
 import random
 from colorama import Fore, init  # Import colorama
 import logging  # Import logging module
+import yaml
 
 
 def main():
@@ -24,7 +25,7 @@ def main():
     browser = BrowserWindow(login_url)
     browser.show()
 
-    browser.cookies_ready.connect(lambda cookies: download_with_cookies_csv(cookies, links_file))  # Connect the signal to the handler
+    browser.cookies_ready.connect(lambda cookies: download_with_cookies_yml(cookies, links_file))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -97,6 +98,41 @@ def get_name_and_links_from_csv(file_path):
         reader = csv.reader(csvfile)
         next(reader, None)  # Skip the header row
         return [(row[0], row[1]) for row in reader if row]
+    
+
+def download_with_cookies_yml(file_path):
+    """
+    Use cookies to download protected data from a YAML file.
+    """
+    with open(file_path, "r") as ymlfile:
+        data = yaml.safe_load(ymlfile)
+    
+    download_dir = "outputs"
+    os.makedirs(download_dir, exist_ok=True)
+
+    for sub_dir, items in data["Known Links"]:
+        sub_dir_path = os.path.join(download_dir, sub_dir)
+        os.makedirs(sub_dir_path, exist_ok=True)
+        for item in items:
+            target_name = item[0]
+            target_link = item[1]
+            logging.info(Fore.CYAN + f"Processing {target_name} with link {target_link}")
+
+            if target_name and target_link:
+                response = requests.get(target_link)
+                if response.status_code == 200:
+                    target = os.path.join(sub_dir_path, os.path.basename(target_name))
+                    with open(target, "wb") as f:
+                        f.write(response.content)
+                    logging.info(Fore.GREEN + f"Downloaded {target_name}")
+                else:
+                    logging.error(Fore.RED + f"Failed to download {target_name}: {response.status_code}" )
+                
+                # Add a random delay between 1 and 5 seconds
+                delay = random.uniform(1, 5)
+                logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
+                time.sleep(delay)
+    after_download()
 
 
 def after_download():
