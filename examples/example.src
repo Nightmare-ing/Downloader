@@ -1,9 +1,12 @@
 # Comment1, will be ignored
 # Empty lines will also be ignored
 
+#! Group 1
 https://file_name1
 https://file_name2
 https://file_name3
+
+#! Group 2
 https://file_name4
 https://file_name5
 https://file_name6
