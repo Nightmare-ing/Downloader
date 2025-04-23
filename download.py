@@ -94,7 +94,7 @@ def download_with_yml(cookies, file_path):
     download_dir = "outputs"
     os.makedirs(download_dir, exist_ok=True)
 
-    for group in data["Known Links"]:
+    for group in data:
         sub_dir_path = os.path.join(download_dir, group["group name"])
         os.makedirs(sub_dir_path, exist_ok=True)
         for pair in group["pairs"]:
