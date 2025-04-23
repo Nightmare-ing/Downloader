@@ -88,6 +88,9 @@ def download_with_yml(cookies, file_path):
     """
     Use cookies to download protected data from a YAML file.
     """
+    # remove the old directory if it exists
+    if os.path.exists(download_dir):
+        shutil.rmtree(download_dir)
     with open(file_path, "r") as ymlfile:
         data = yaml.safe_load(ymlfile)
     
