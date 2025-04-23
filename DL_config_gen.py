@@ -27,7 +27,7 @@ def parse_args():
         sys.exit(1)
     
     # check the extension of the file
-    if not sys.argv[2].endswith(".src"):
+    if not sys.argv[2].endswith(".csvsrc"):
         print("The file must have a .src extension.")
         sys.exit(1)
     
