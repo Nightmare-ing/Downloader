@@ -3,6 +3,7 @@ import os
 from urllib.parse import urlparse
 import csv  # Import CSV module
 import argparse
+import yaml
 
 def extract_file_name(url):
     """
@@ -63,6 +64,41 @@ def gen_csv_with_src(links_src, folder):
             writer.writerow([file_name, url])  # Write file name and link to CSV
             print(f"Added to CSV: {file_name}, {url}")
 
+def gen_yml_with_src(links_src, folder):
+    """
+    Generate YAML file with file names and links from the given src file
+    """
+    # get the name of the file links_src without extension
+    file_name = os.path.splitext(os.path.basename(links_src))[0] + ".yml"
+    yml_file = os.path.join(folder, file_name)
+    os.makedirs(os.path.dirname(yml_file), exist_ok=True)
+
+    with open(links_src, "r") as source_file, open(yml_file, "w") as yml_file:
+        lines = source_file.readlines()
+        data = []
+        group = {"group name": "default", "pairs": []}
+        group_count = 0
+
+        for line in lines:
+            # Skip comments and empty lines
+            if line.startswith("# ") or line.strip() == "":
+                continue
+            # Start new group if line starts with "#! "
+            if line.startswith("#! "):
+                group_name = line[3:].strip('\n')
+                if group_name:
+                    group["group name"] = group_name
+                    group["pairs"] = []
+                    group_count += 1
+                print(f"New group: {group_name}")
+                if group_count > 1:
+                    data.append(group.copy())
+                continue
+            url = line.strip()
+            file_name = extract_file_name(url)
+            group["pairs"].append({"file name": file_name, "link": url})
+            print(f"Added to YAML: {file_name}, {url}")
+        yaml.dump(data, yml_file)
 
 if __name__ == "__main__":
     main()
