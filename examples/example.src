@@ -1,3 +1,6 @@
+# Comment1, will be ignored
+# Empty lines will also be ignored
+
 https://file_name1
 https://file_name2
 https://file_name3

@@ -31,11 +31,13 @@ Or you can run in the non-verbose form
 
 ### Generate Files for Downloading
 
-You can run script `DL_config_gen.py` to generate downloading configs from source file `*.csvsrc`, an example for `*.csvsrc` file is shown in dir `examples/`. The code to run the script is
+You can run script `DL_config_gen.py` to generate downloading configs from source file `*.src`, an example for `*.src` file is shown in dir `examples/`. The code to run the script is
 
 ```shell
-(.venv)$ python3 DL_config_gen.py -f <links.csvsrc>
+(.venv)$ python3 DL_config_gen.py -f <links.src>
 ```
+
+All the lines start with `#` and empty lines will be ignored
 
 ## Features
 
