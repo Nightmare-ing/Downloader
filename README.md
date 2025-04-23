@@ -37,8 +37,8 @@ Or you can run in the non-verbose form
 ## TODO
 
 - Process multiple csv files
-  - Becase csv file can't contain comments, so unable to group links with notation
+  - [ ] Becase csv file can't contain comments, so unable to group links with notation
   - [x] Try to use something like json file, each term contains the name of the link group and the file name of this link group
 - Login to multiple required websites
-  - May want to download files from several different websites
-  - Try to store login urls into a csv file
+  - [ ] May want to download files from several different websites
+  - [ ] Try to store login urls into a csv file
