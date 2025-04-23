@@ -1,18 +1,12 @@
-- 
-    group name: test_group1
-    pairs:
-        - 
-            file name: file1
-            link: https://file1
-        - 
-            file name: file2
-            link: https://file2
-- 
-    group name: test_group2
-    pairs:
-        - 
-            file name: file3
-            link: https://file3
-        - 
-            file name: file4
-            link: https://file4
+- group name: test_group1
+  pairs:
+  - file name: file1
+    link: https://file1
+  - file name: file2
+    link: https://file2
+- group name: test_group2
+  pairs:
+  - file name: file3
+    link: https://file3
+  - file name: file4
+    link: https://file4
