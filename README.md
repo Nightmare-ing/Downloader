@@ -34,10 +34,12 @@ Or you can run in the non-verbose form
 You can run script `DL_config_gen.py` to generate downloading configs from source file `*.src`, an example for `*.src` file is shown in dir `examples/`. The code to run the script is
 
 ```shell
-(.venv)$ python3 DL_config_gen.py -f <links.src>
+(.venv)$ python3 DL_config_gen.py -f <links.src> -o <output-dir> -t <csv or yml>
 ```
 
-All the lines start with `#` and empty lines will be ignored
+- All the lines start with `#` and empty lines will be ignored if the output format is csv
+- All the lines start with `# ` and empty lines will be ignored if the ouput format is yml
+  - Lines start with `#! ` will be used as the group name
 
 ## Features
 
