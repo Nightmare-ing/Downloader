@@ -27,11 +27,18 @@ Or you can run in the non-verbose form
 (.venv)$ python3 download.py -f <links.csv> -u <login url>
 ```
 
+## Features
+
+- Support downloading with both `yml` file and `csv` file.
+  - Format of both file are shown in `links-example.csv` and `links-example.yml`
+  - If you download with `yml`, the script will create sub-directories with the value of `group name` in `yml`
+  - If you download with `csv`, no sub-directories will be created, all files are under directory `outputs`
+
 ## TODO
 
 - Process multiple csv files
   - Becase csv file can't contain comments, so unable to group links with notation
-  - Try to use something like json file, each term contains the name of the link group and the file name of this link group
+  - [x] Try to use something like json file, each term contains the name of the link group and the file name of this link group
 - Login to multiple required websites
   - May want to download files from several different websites
   - Try to store login urls into a csv file
