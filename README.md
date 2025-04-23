@@ -30,7 +30,7 @@ Or you can run in the non-verbose form
 ## Features
 
 - Support downloading with both `yml` file and `csv` file.
-  - Format of both file are shown in `links-example.csv` and `links-example.yml`
+  - Format of both file are shown in `examples/links-example.csv` and `examples/links-example.yml`
   - If you download with `yml`, the script will create sub-directories with the value of `group name` in `yml`
   - If you download with `csv`, no sub-directories will be created, all files are under directory `outputs`
 
