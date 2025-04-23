@@ -12,9 +12,10 @@ def extract_file_name(url):
     return os.path.basename(parsed_url.path)
 
 def main():
-    input_file = "inputs/links.src"
+    args = parse_args()
+    input_file = args.file
     output_dir = "inputs"
-    gen_csv_with_links(input_file, output_dir)
+    gen_csv_with_src(input_file, output_dir)
             
 
 def parse_args():
@@ -36,7 +37,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def gen_csv_with_links(links_src, folder):
+def gen_csv_with_src(links_src, folder):
     """
     Generate CSV file with file names and links from the given src file which only contain links
     """
