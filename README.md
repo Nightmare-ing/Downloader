@@ -15,6 +15,8 @@ pip install -r requirements.txt
 
 ## Run the Script
 
+### Download Files
+
 Run with the command in the verbose form as following, replace `<login url>` with your desired URL, and replace `<links.csv>` with the directory to the file which contain links.
 
 ```shell
@@ -25,6 +27,14 @@ Or you can run in the non-verbose form
 
 ```shell
 (.venv)$ python3 download.py -f <links.csv> -u <login url>
+```
+
+### Generate Files for Downloading
+
+You can run script `DL_config_gen.py` to generate downloading configs from source file `*.csvsrc`, an example for `*.csvsrc` file is shown in dir `examples/`. The code to run the script is
+
+```shell
+(.venv)$ python3 DL_config_gen.py -f <links.csvsrc>
 ```
 
 ## Features
