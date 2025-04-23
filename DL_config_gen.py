@@ -27,7 +27,7 @@ def parse_args():
         sys.exit(1)
     
     # check the extension of the file
-    if not sys.argv[2].endswith(".csvsrc"):
+    if not sys.argv[2].endswith(".src"):
         print("The file must have a .src extension.")
         sys.exit(1)
     
@@ -51,6 +51,9 @@ def gen_csv_with_src(links_src, folder):
         writer.writerow(["File Name", "Link"])  # Write CSV header
 
         for line in lines:
+            # Skip comments and empty lines
+            if line.startswith("#") or line.strip() == "":
+                continue
             url = line.strip()
             file_name = extract_file_name(url)
             writer.writerow([file_name, url])  # Write file name and link to CSV
