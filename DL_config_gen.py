@@ -14,8 +14,10 @@ def extract_file_name(url):
 def main():
     args = parse_args()
     input_file = args.file
-    output_dir = "inputs"
-    gen_csv_with_src(input_file, output_dir)
+    if args.type == "csv":
+        gen_csv_with_src(input_file, args.output_dir)
+    elif args.type == "yml":
+        gen_yml_with_src(input_file, args.output_dir)
             
 
 def parse_args():
@@ -34,12 +36,14 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Generate CSV containing file name and links" \
     "from links in src file")
     parser.add_argument('-f', '--file', type=str, required=True, help='Path to the SRC file containing links')
+    parser.add_argument('-o', '--output_dir', type=str, required=True, help='Path to the output folder')
+    parser.add_argument('-t', '--type', type=str, choices=['csv', 'yml'], required=True, help='Type of output file (csv or yml)')
     return parser.parse_args()
 
 
 def gen_csv_with_src(links_src, folder):
     """
-    Generate CSV file with file names and links from the given src file which only contain links
+    Generate CSV file with file names and links from the given src file
     """
     # get the name of the file links_src without extension
     file_name = os.path.splitext(os.path.basename(links_src))[0] + ".csv"
