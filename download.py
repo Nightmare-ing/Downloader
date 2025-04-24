@@ -15,6 +15,12 @@ import yaml
 
 
 def main():
+    download_dir = "outputs"
+    # remove the old directory if it exists
+    if os.path.exists(download_dir):
+        shutil.rmtree(download_dir)
+    os.makedirs(download_dir, exist_ok=True)
+
     init(autoreset=True)  # Initialize colorama with auto-reset
     setup_logging()  # Set up logging
     args = parse_args()
