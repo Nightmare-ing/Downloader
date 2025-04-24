@@ -32,9 +32,9 @@ def main():
     os.makedirs(download_dir, exist_ok=True)
 
     if links_file.endswith(".csv"):
-        browser.cookies_ready.connect(lambda cookies: download_with_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
+        browser.cookies_ready.connect(lambda cookies: parse_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
     elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
-        browser.cookies_ready.connect(lambda cookies: download_with_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
+        browser.cookies_ready.connect(lambda cookies: parse_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -69,26 +69,33 @@ def parse_args():
     return parser.parse_args()
     
 
-def download_with_csv(cookies, links_file, download_dir):
+def parse_csv(cookies, csv, download_dir):
     """
-    Use cookies to download protected data.
+    Use cookies to download protected data described in a CSV file.
+    :param cookies: The cookies to use for the download.
+    :param csv: The path to the CSV file.
+    :param download_dir: The directory to save all the downloaded things described in CSV file.
     """
-    with open(links_file, "r", newline='') as csvfile:
+    with open(csv, "r", newline='') as csvfile:
         reader = csv.reader(csvfile)
         next(reader, None)  # Skip the header row
         name_with_links = [(row[0], row[1]) for row in reader if row]
     for pair in name_with_links:
         target_name = pair[0]
         target_link = pair[1]
-        download(download_dir, target_name, target_link, cookies)
+        download_file_with_lnk(download_dir, target_name, target_link, cookies)
     after_download()
 
 
-def download_with_yml(cookies, file_path, download_dir):
+def parse_yml(cookies, yml, download_dir):
     """
-    Use cookies to download protected data from a YAML file.
+    Use cookies to download protected data described in a YAML file.
+    :param cookies: The cookies to use for the download.
+    :param file_path: The path to the YAML file.
+    :param download_dir: The directory to save all the downloaded things described in YAML file.
+    :return: None
     """
-    with open(file_path, "r") as ymlfile:
+    with open(yml, "r") as ymlfile:
         data = yaml.safe_load(ymlfile)
     for group in data:
         sub_dir_path = os.path.join(download_dir, group["group name"])
@@ -96,7 +103,7 @@ def download_with_yml(cookies, file_path, download_dir):
         for pair in group["pairs"]:
             target_name = pair["file name"]
             target_link = pair["link"]
-            download(sub_dir_path, target_name, target_link, cookies)
+            download_file_with_lnk(sub_dir_path, target_name, target_link, cookies)
     after_download()
 
 
@@ -109,7 +116,15 @@ def after_download():
     logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!")
 
 
-def download(folder, file, link, cookies):
+def download_file_with_lnk(folder, file, link, cookies):
+    """
+    Download a file using the provided link and cookies.
+    :param folder: The folder to save the downloaded file.
+    :param file: The name of the file to save.
+    :param link: The link to download the file from.
+    :param cookies: The cookies to use for the download.
+    :return: None
+    """
     logging.info(Fore.CYAN + f"Processing {file} with link {link}")
     if file and link:
         response = requests.get(link, cookies=cookies)
