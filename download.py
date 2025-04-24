@@ -24,18 +24,16 @@ def main():
     browser = BrowserWindow(login_url)
     browser.show()
 
-    file_batches_dir = args.input_dir # Get the file containing links from command line arguments
-    download_dir = "outputs"
-    # remove the old directory if it exists
-    if os.path.exists(download_dir):
-        shutil.rmtree(download_dir)
-    os.makedirs(download_dir, exist_ok=True)
-
-    browser.cookies_ready.connect(lambda cookies: batch_download(cookies, file_batches_dir, download_dir))
-    # if links_file.endswith(".csv"):
-        # browser.cookies_ready.connect(lambda cookies: parse_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
-    # elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
-    #     browser.cookies_ready.connect(lambda cookies: parse_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
+    config_file_src = args.file
+    if os.path.isdir(config_file_src):
+        file_batches_dir = config_file_src
+        browser.cookies_ready.connect(lambda cookies: batch_download(cookies, file_batches_dir, download_dir))
+    else:
+        links_file = config_file_src
+        if links_file.endswith(".csv"):
+            browser.cookies_ready.connect(lambda cookies: parse_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
+        elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
+            browser.cookies_ready.connect(lambda cookies: parse_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -65,8 +63,8 @@ def parse_args():
         sys.exit(1)
     
     parser = argparse.ArgumentParser(description="Download files using cookies.")
-    parser.add_argument('-d', '--input_dir', type=str, required=True, help='Path to the dir containing all config files')
     parser.add_argument('-u', '--url', type=str, required=True, help='Login URL for authentication.')
+    parser.add_argument('-f', '--file', type=str, required=True, help='Path to the CSV or YML file containing links, or path to the dir containing bathes of CSV or YML files')
     return parser.parse_args()
     
     
