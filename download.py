@@ -36,10 +36,7 @@ def main():
         browser.cookies_ready.connect(lambda cookies: batch_download(cookies, file_batches_dir, download_dir))
     else:
         links_file = config_file_src
-        if links_file.endswith(".csv"):
-            browser.cookies_ready.connect(lambda cookies: parse_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
-        elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
-            browser.cookies_ready.connect(lambda cookies: parse_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
+        browser.cookies_ready.connect(lambda cookies: single_download(cookies, links_file, download_dir))
     sys.exit(app.exec_())
 
 
@@ -73,6 +70,23 @@ def parse_args():
     parser.add_argument('-f', '--file', type=str, required=True, help='Path to the CSV or YML file containing links, or path to the dir containing bathes of CSV or YML files')
     return parser.parse_args()
     
+
+def single_download(cookies, links_file, download_dir):
+    """
+    Use cookies to download protected data described in a CSV or YML file.
+    :param cookies: The cookies to use for the download.
+    :param links_file: The path to the CSV or YML file.
+    :param download_dir: The directory to save all the downloaded things described in CSV or YML file.
+    """
+    if links_file.endswith(".csv"):
+        parse_csv(cookies, links_file, download_dir)
+    elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
+        parse_yml(cookies, links_file, download_dir)
+    else:
+        logging.error(Fore.RED + "Unsupported file format. Please provide a CSV or YML file.")
+        sys.exit(1)
+    after_download()
+
     
 def batch_download(cookies, input_dir, output_dir):
     """
