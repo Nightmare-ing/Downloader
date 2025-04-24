@@ -91,7 +91,7 @@ def gen_yml_with_src(links_src, folder):
                     group["pairs"] = []
                     group_count += 1
                 print(f"New group: {group_name}")
-                if group_count > 1:
+                if group_count >= 1:
                     data.append(group.copy())
                 continue
             url = line.strip()
