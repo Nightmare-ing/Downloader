@@ -61,9 +61,10 @@ You can run script `DL_config_gen.py` to generate downloading configs from sourc
 
 ## TODO
 
-- Process multiple csv files
-  - [ ] Becase csv file can't contain comments, so unable to group links with notation
-  - [x] Try to use something like json file, each term contains the name of the link group and the file name of this link group
-- Login to multiple required websites
-  - [ ] May want to download files from several different websites
-  - [ ] Try to store login urls into a csv file
+- [x] Process multiple csv files
+  - Becase csv file can't contain comments, so unable to group links with notation
+  - Try to use something like json file, each term contains the name of the link group and the file name of this link group
+- [ ] Login to multiple required websites
+  - May want to download files from several different websites
+  - Try to store login urls into a csv file
+- [x] Support batch downloading according to multiple CSV or YAML files
