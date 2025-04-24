@@ -24,17 +24,18 @@ def main():
     browser = BrowserWindow(login_url)
     browser.show()
 
-    links_file = args.file # Get the file containing links from command line arguments
+    file_batches_dir = args.input_dir # Get the file containing links from command line arguments
     download_dir = "outputs"
     # remove the old directory if it exists
     if os.path.exists(download_dir):
         shutil.rmtree(download_dir)
     os.makedirs(download_dir, exist_ok=True)
 
-    if links_file.endswith(".csv"):
-        browser.cookies_ready.connect(lambda cookies: parse_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
-    elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
-        browser.cookies_ready.connect(lambda cookies: parse_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
+    browser.cookies_ready.connect(lambda cookies: batch_download(cookies, file_batches_dir, download_dir))
+    # if links_file.endswith(".csv"):
+        # browser.cookies_ready.connect(lambda cookies: parse_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
+    # elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
+    #     browser.cookies_ready.connect(lambda cookies: parse_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -64,10 +65,29 @@ def parse_args():
         sys.exit(1)
     
     parser = argparse.ArgumentParser(description="Download files using cookies.")
-    parser.add_argument('-f', '--file', type=str, required=True, help='Path to the CSV file containing links.')
+    parser.add_argument('-d', '--input_dir', type=str, required=True, help='Path to the dir containing all config files')
     parser.add_argument('-u', '--url', type=str, required=True, help='Login URL for authentication.')
     return parser.parse_args()
     
+    
+def batch_download(cookies, input_dir, output_dir):
+    """
+    Download according to all files in the input directory and save them to the output directory.
+    :param cookies: The cookies use for downloading.
+    :param input_dir: The directory containing the csv or yml files used for downloading.
+    :param output_dir: The root directory to save all the downloaded things.
+    """
+    for conifg_file in os.listdir(input_dir):
+        if conifg_file.endswith(".csv") or conifg_file.endswith(".yml") or conifg_file.endswith(".yaml"):
+            config_file_path = os.path.join(input_dir, conifg_file)
+            if conifg_file.endswith(".csv"):
+                parse_csv(cookies, config_file_path, output_dir)
+            else:
+                config_file_name = os.path.splitext(conifg_file)[0]
+                download_dir = os.path.join(output_dir, config_file_name)
+                parse_yml(cookies, config_file_path, download_dir)
+    after_download()
+
 
 def parse_csv(cookies, csv, download_dir):
     """
