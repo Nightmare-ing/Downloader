@@ -25,10 +25,16 @@ def main():
     browser.show()
 
     links_file = args.file # Get the file containing links from command line arguments
+    download_dir = "outputs"
+    # remove the old directory if it exists
+    if os.path.exists(download_dir):
+        shutil.rmtree(download_dir)
+    os.makedirs(download_dir, exist_ok=True)
+
     if links_file.endswith(".csv"):
-        browser.cookies_ready.connect(lambda cookies: download_with_csv(cookies, links_file))
+        browser.cookies_ready.connect(lambda cookies: download_with_csv(cookies, links_file, download_dir)) # Connect the signal to the handler
     elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
-        browser.cookies_ready.connect(lambda cookies: download_with_yml(cookies, links_file))  # Connect the signal to the handler
+        browser.cookies_ready.connect(lambda cookies: download_with_yml(cookies, links_file, download_dir))  # Connect the signal to the handler
     sys.exit(app.exec_())
 
 
@@ -63,16 +69,10 @@ def parse_args():
     return parser.parse_args()
     
 
-def download_with_csv(cookies, links_file):
+def download_with_csv(cookies, links_file, download_dir):
     """
     Use cookies to download protected data.
     """
-    download_dir = "outputs"
-    # remove the old directory if it exists
-    if os.path.exists(download_dir):
-        shutil.rmtree(download_dir)
-    os.makedirs(download_dir, exist_ok=True)
-    
     with open(links_file, "r", newline='') as csvfile:
         reader = csv.reader(csvfile)
         next(reader, None)  # Skip the header row
@@ -84,19 +84,12 @@ def download_with_csv(cookies, links_file):
     after_download()
 
 
-def download_with_yml(cookies, file_path):
+def download_with_yml(cookies, file_path, download_dir):
     """
     Use cookies to download protected data from a YAML file.
     """
-    download_dir = "outputs"
-    # remove the old directory if it exists
-    if os.path.exists(download_dir):
-        shutil.rmtree(download_dir)
     with open(file_path, "r") as ymlfile:
         data = yaml.safe_load(ymlfile)
-    
-    os.makedirs(download_dir, exist_ok=True)
-
     for group in data:
         sub_dir_path = os.path.join(download_dir, group["group name"])
         os.makedirs(sub_dir_path, exist_ok=True)
