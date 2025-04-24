@@ -100,6 +100,7 @@ def parse_yml(cookies, yml, download_dir):
     for group in data:
         sub_dir_path = os.path.join(download_dir, group["group name"])
         os.makedirs(sub_dir_path, exist_ok=True)
+        logging.info(Fore.CYAN + f"Creating group: {group['group name']}")
         for pair in group["pairs"]:
             target_name = pair["file name"]
             target_link = pair["link"]
