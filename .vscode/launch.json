@@ -5,12 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python Debugger: Current File with Arguments",
+            "name": "Python Debugger: downloader.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "${file}",
+            "program": "${workspaceFolder}/downloader.py",
             "console": "integratedTerminal",
-            "args": "-f inputs/EECS16B-Fa20.src -o inputs -t yml"
+            "args": "-f inputs/inputs/input_test -u https://github.com"
         }
     ]
 }
