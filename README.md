@@ -29,6 +29,16 @@ Or you can run in the non-verbose form
 (.venv)$ python3 download.py -f <links.csv> -u <login url>
 ```
 
+If you give a single file after `-f` flag, the script will download things listed in this file. If you give path to the directory which contains multiple CSV or YAML file, the script will download contents listed in all these files, and store those downloaded data in the directory with the same name as the CSV or YAML file.
+
+For example, you run command 
+
+```shell
+(.venv)$ python3 download.py -f <input dir> -u <login url>
+```
+
+And there are two CSV files under the directory `input dir`, called `csv1.csv` and `csv2.csv`, then two sub directories named `csv1` and `csv2` will be created, and data in `csv1` are all the links listed in file `csv1.csv`, similar for `csv2`.
+
 ### Generate Files for Downloading
 
 You can run script `DL_config_gen.py` to generate downloading configs from source file `*.src`, an example for `*.src` file is shown in dir `examples/`. The code to run the script is
@@ -47,6 +57,7 @@ You can run script `DL_config_gen.py` to generate downloading configs from sourc
   - Format of both file are shown in `examples/links-example.csv` and `examples/links-example.yml`
   - If you download with `yml`, the script will create sub-directories with the value of `group name` in `yml`
   - If you download with `csv`, no sub-directories will be created, all files are under directory `outputs`
+- Support downloading with single file and downloading with batch files
 
 ## TODO
 
