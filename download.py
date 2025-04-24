@@ -104,7 +104,6 @@ def parse_csv(cookies, csv, download_dir):
         target_name = pair[0]
         target_link = pair[1]
         download_file_with_lnk(download_dir, target_name, target_link, cookies)
-    after_download()
 
 
 def parse_yml(cookies, yml, download_dir):
@@ -125,7 +124,6 @@ def parse_yml(cookies, yml, download_dir):
             target_name = pair["file name"]
             target_link = pair["link"]
             download_file_with_lnk(sub_dir_path, target_name, target_link, cookies)
-    after_download()
 
 
 def after_download():
