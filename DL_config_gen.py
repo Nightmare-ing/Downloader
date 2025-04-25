@@ -85,7 +85,7 @@ def gen_yml_with_src(links_src, folder):
                 continue
             # Start new group if line starts with "#! "
             if line.startswith("#! "):
-                group_name = line[3:].strip('\n')
+                group_name = line[3:].strip()
                 if group_name:
                     group["group name"] = group_name
                     group["pairs"] = []
