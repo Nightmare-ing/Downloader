@@ -11,7 +11,8 @@ import requests
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 MIMETYPES = {"pdf": "application/pdf",
-             "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation"}
+             "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+             "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}
 
 def main():
     """
@@ -42,6 +43,12 @@ def parse_link(link):
     if "drive.google.com" in link:
         file_id = link.split('/')[-2]
     elif "docs.google.com/presentation" in link:
+        if "edit" in link:
+            file_id = link.split('/')[-2]
+        else:
+            file_id = link.split('/')[-1]
+        return file_id
+    elif "docs.google.com/document" in link:
         if "edit" in link:
             file_id = link.split('/')[-2]
         else:
