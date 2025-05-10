@@ -45,6 +45,8 @@ def parse_link(link):
             file_id = link.split('/')[-2]
         elif "open?id=" in link:
             file_id = link.split('=')[-1]
+        elif "folders" in link:
+            raise ValueError("Invalid Google Drive link: Folder links are not supported")
         else:
             raise ValueError("Invalid Google Drive link")
     elif "docs.google.com/presentation" in link:

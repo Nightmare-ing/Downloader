@@ -30,6 +30,6 @@ class TestGoogleDownloadsLocal(unittest.TestCase):
         link = "https://docs.google.com/document/d/1JqfsZrSlf63v__sRdMjeFUMOXpklDAWcVeQx-EOVyDo"
         file_id = parse_link(link)
         download_docs_with_id(file_id, self.service, types=["docx", "pdf"])
-
+    
 if __name__ == "__main__":
     unittest.main()
