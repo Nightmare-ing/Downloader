@@ -12,6 +12,7 @@ import random
 from colorama import Fore, init  # Import colorama
 import logging  # Import logging module
 import yaml
+from google_drive_downloader import create_service, get_file_id, download_docs_with_id, download_file_with_id
 
 
 def main():
@@ -124,7 +125,7 @@ def parse_csv(cookies, csv, download_dir):
         download_file_with_lnk(download_dir, target_name, target_link, cookies)
 
 
-def parse_yml(cookies, yml, download_dir):
+def parse_yml(service, creds, cookies, yml, download_dir):
     """
     Use cookies to download protected data described in a YAML file.
     :param cookies: The cookies to use for the download.
@@ -135,13 +136,27 @@ def parse_yml(cookies, yml, download_dir):
     with open(yml, "r") as ymlfile:
         data = yaml.safe_load(ymlfile)
     for group in data:
+        if group["pairs"] == []:
+            continue
         sub_dir_path = os.path.join(download_dir, group["group name"])
         os.makedirs(sub_dir_path, exist_ok=True)
         logging.info(Fore.CYAN + f"Creating group: {group['group name']}")
         for pair in group["pairs"]:
             target_name = pair["file name"]
             target_link = pair["link"]
-            download_file_with_lnk(sub_dir_path, target_name, target_link, cookies)
+            if "google.com" in target_link:
+                file_id = get_file_id(target_link)
+                if "presentation" in target_link:
+                    download_docs_with_id(sub_dir_path, file_id, service, types=["pptx", "pdf"])
+                elif "document" in target_link:
+                    download_docs_with_id(sub_dir_path, file_id, service, types=["docx", "pdf"])
+                elif "drive.google.com" in target_link:
+                    download_file_with_id(sub_dir_path, file_id, creds, "pdf")
+                else:
+                    logging.error(Fore.RED + f"Unsupported Google Drive link: {target_link}")
+                    continue
+            else:
+                download_file_with_lnk(sub_dir_path, target_name, target_link, cookies)
 
 
 def after_download():
@@ -177,6 +192,13 @@ def download_file_with_lnk(folder, file, link, cookies):
         delay = random.uniform(1, 5)
         logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
         time.sleep(delay)
+    if link and "google.com" in link:
+        file_id = get_file_id(link)
+        creds, service = create_service()
+        download_docs_with_id(file_id, service, types=["pptx", "pdf"])
+
+
+
 
 
 if __name__ == '__main__':
