@@ -4,7 +4,7 @@ from urllib.parse import urlparse
 import csv  # Import CSV module
 import argparse
 import yaml
-from google_drive_downloader import parse_google_link
+from google_drive_downloader import get_file_id
 
 def extract_file_name(url):
     """

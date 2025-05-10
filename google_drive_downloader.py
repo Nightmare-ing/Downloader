@@ -27,7 +27,7 @@ def main():
 
     # doc_id1 = parse_link(doc_link1)
     # doc_id = parse_link(doc_link)
-    file_id = parse_google_link(file_link)
+    file_id = get_file_id(file_link)
 
 
     # download_pres_with_id(doc_id, service)
@@ -35,7 +35,7 @@ def main():
     download_file_with_id(file_id, creds)
 
 
-def parse_google_link(link):
+def get_file_id(link):
     """
     Parse the Google Drive link to extract the file ID.
     """
@@ -87,7 +87,7 @@ def create_service():
     return creds, service
 
 
-def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
+def download_docs_with_id(storage_path, file_id, service, types=["pptx", "pdf"]):
     """
     Download a Google Doc file using its file ID.
     """
@@ -98,7 +98,7 @@ def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
         for file_type in types:
             request = service.files().export_media(fileId=file_id,
                                                    mimeType=MIMETYPES[file_type])
-            file_path = os.path.join(os.getcwd(), "outputs", file_name + "." + file_type)
+            file_path = os.path.join(storage_path, file_name + "." + file_type)
             fh = io.BytesIO()
             downloader = MediaIoBaseDownload(fh, request)
             done = False
@@ -114,7 +114,7 @@ def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
         print(f'An error occurred: {error}')
 
 
-def download_file_with_id(file_id, creds, file_type="mp4"):
+def download_file_with_id(storage_path, file_id, creds, file_type="pdf"):
     """
     Download a Google Doc file using its file ID.
     """
@@ -123,7 +123,7 @@ def download_file_with_id(file_id, creds, file_type="mp4"):
     response = requests.get(url, headers=headers, stream=True)
     if response.status_code == 200:
         file_name = file_id + "." + file_type
-        file_path = os.path.join(os.getcwd(), "outputs", file_name)
+        file_path = os.path.join(storage_path, file_name)
         with open(file_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
