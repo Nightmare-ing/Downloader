@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 import csv  # Import CSV module
 import argparse
 import yaml
+from google_drive_downloader import parse_google_link
 
 def extract_file_name(url):
     """
@@ -81,7 +82,7 @@ def gen_yml_with_src(links_src, folder):
 
         for line in lines:
             # Skip comments and empty lines
-            if line.startswith("# ") or line.strip() == "":
+            if line.startswith("# DONE! ") or line.strip() == "":
                 continue
             # Start new group if line starts with "#! "
             if line.startswith("#! "):
@@ -94,10 +95,14 @@ def gen_yml_with_src(links_src, folder):
                 if group_count >= 1:
                     data.append(group.copy())
                 continue
-            url = line.strip()
-            file_name = extract_file_name(url)
-            group["pairs"].append({"file name": file_name, "link": url})
-            print(f"Added to YAML: {file_name}, {url}")
+            if line.startwith("# NEED HELP!"):
+                url = line.replace("# NEED HELP! ", "").strip()
+                if "https://inst.eecs.berkeley.edu" in url or "http://inst.eecs.berkeley.edu" in url:
+                    file_name = extract_file_name(url)
+                elif "google.com" in line:
+                    file_name = ""
+                group["pairs"].append({"file name": file_name, "link": url})
+                print(f"Added to YAML: {file_name}, {url}")
         yaml.dump(data, yml_file)
 
 if __name__ == "__main__":
