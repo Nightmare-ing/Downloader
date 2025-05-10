@@ -95,7 +95,7 @@ def gen_yml_with_src(links_src, folder):
                 if group_count >= 1:
                     data.append(group.copy())
                 continue
-            if line.startwith("# NEED HELP!"):
+            if line.startswith("# NEED HELP!"):
                 url = line.replace("# NEED HELP! ", "").strip()
                 if "https://inst.eecs.berkeley.edu" in url or "http://inst.eecs.berkeley.edu" in url:
                     file_name = extract_file_name(url)
