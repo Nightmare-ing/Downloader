@@ -8,6 +8,7 @@ import os.path
 import io
 import requests
 import logging
+from colorama import Fore, Style
 
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
@@ -47,9 +48,9 @@ def get_file_id(link):
         elif "open?id=" in link:
             file_id = link.split('=')[-1]
         elif "folders" in link:
-            logging.error("Google Drive folder links: {link} are not supported.")
+            logging.error(Fore.RED + "Google Drive folder links: {link} are not supported." + Style.RESET_ALL)
         else:
-            logging.error("Invalid Google Drive link: {link}.")
+            logging.error(Fore.RED + "Invalid Google Drive link: {link}." + Style.RESET_ALL)
     elif "docs.google.com/presentation" in link:
         if "edit" in link:
             file_id = link.split('/')[-2]
@@ -61,7 +62,7 @@ def get_file_id(link):
         else:
             file_id = link.split('/')[-1]
     else:
-        logging.error("Invalid Google Docs link: {link}.")
+        logging.error(Fore.RED + "Invalid Google Docs link: {link}." + Style.RESET_ALL)
     return file_id
 
 
@@ -103,16 +104,16 @@ def download_docs_with_id(storage_path, file_id, service, types=["pptx", "pdf"])
             fh = io.BytesIO()
             downloader = MediaIoBaseDownload(fh, request)
             done = False
-            logging.info(f"Downloading {file_name} as {file_type}...")
+            logging.info(Fore.CYAN + f"Downloading {file_name} as {file_type}..." + Style.RESET_ALL)
             while done is False:
                 status, done = downloader.next_chunk()
-                logging.info(f"Download {int(status.progress() * 100)}%.")
+                logging.info(Fore.YELLOW + f"Download {int(status.progress() * 100)}%." + Style.RESET_ALL)
             # Save the file locally
             with open(file_path, 'wb') as f:
                 f.write(fh.getvalue())
-            logging.info(f"File downloaded as {file_path}")
+            logging.info(Fore.GREEN + f"File downloaded as {file_path}" + Style.RESET_ALL)
     except HttpError as error:
-        logging.error(f"An error occurred: {error}")
+        logging.error(Fore.RED + f"An error occurred: {error}"  + Style.RESET_ALL)
 
 
 def download_file_with_id(storage_path, file_id, creds, file_type="pdf"):
@@ -123,15 +124,16 @@ def download_file_with_id(storage_path, file_id, creds, file_type="pdf"):
     url = f"https://www.googleapis.com/drive/v3/files/{file_id}?alt=media"
     response = requests.get(url, headers=headers, stream=True)
     if response.status_code == 200:
+        logging.info(Fore.CYAN + f"Downloading {file_id} as {file_type}..." + Style.RESET_ALL)
         file_name = file_id + "." + file_type
         file_path = os.path.join(storage_path, file_name)
         with open(file_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
-        logging.info(f"File downloaded as {file_path}")
+        logging.info(Fore.GREEN + f"File downloaded as {file_path}" + Style.RESET_ALL)
     else:
-        logging.error(f"An error occurred: {response.status_code}")
+        logging.error(Fore.RED + f"An error occurred: {response.status_code}" + Style.RESET_ALL)
 
 
 if __name__ == '__main__':

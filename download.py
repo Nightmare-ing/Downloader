@@ -9,7 +9,7 @@ import shutil
 import argparse
 import time
 import random
-from colorama import Fore, init  # Import colorama
+from colorama import Fore, init, Style  # Import colorama
 import logging  # Import logging module
 import yaml
 from google_drive_downloader import create_service, get_file_id, download_docs_with_id, download_file_with_id
@@ -84,7 +84,7 @@ def single_download(cookies, links_file, download_dir):
     elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
         parse_yml(cookies, links_file, download_dir)
     else:
-        logging.error(Fore.RED + "Unsupported file format. Please provide a CSV or YML file.")
+        logging.error(Fore.RED + "Unsupported file format. Please provide a CSV or YML file." + Style.RESET_ALL)
         sys.exit(1)
     after_download()
 
@@ -140,7 +140,7 @@ def parse_yml(service, creds, cookies, yml, download_dir):
             continue
         sub_dir_path = os.path.join(download_dir, group["group name"])
         os.makedirs(sub_dir_path, exist_ok=True)
-        logging.info(Fore.CYAN + f"Creating group: {group['group name']}")
+        logging.info(Fore.CYAN + f"Creating group: {group['group name']}" + Style.RESET_ALL)
         for pair in group["pairs"]:
             target_name = pair["file name"]
             target_link = pair["link"]
@@ -153,7 +153,7 @@ def parse_yml(service, creds, cookies, yml, download_dir):
                 elif "drive.google.com" in target_link:
                     download_file_with_id(sub_dir_path, file_id, creds, "pdf")
                 else:
-                    logging.error(Fore.RED + f"Unsupported Google Drive link: {target_link}")
+                    logging.error(Fore.RED + f"Unsupported Google Drive link: {target_link}" + Style.RESET_ALL)
                     continue
             else:
                 download_file_with_lnk(sub_dir_path, target_name, target_link, cookies)
@@ -163,9 +163,9 @@ def after_download():
     """
     Perform any actions needed after the download is complete.
     """
-    logging.info(Fore.MAGENTA + "Finish Downloading All the Files! Creating a zip file...")
+    logging.info(Fore.MAGENTA + "Finish Downloading All the Files! Creating a zip file..." + Style.RESET_ALL)
     shutil.make_archive("outputs", 'zip', "outputs")
-    logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!")
+    logging.info(Fore.BLUE + "Thank you for downloading the files! Have a great day!" + Style.RESET_ALL)
 
 
 def download_file_with_lnk(folder, file, link, cookies):
@@ -177,20 +177,20 @@ def download_file_with_lnk(folder, file, link, cookies):
     :param cookies: The cookies to use for the download.
     :return: None
     """
-    logging.info(Fore.CYAN + f"Processing {file} with link {link}")
+    logging.info(Fore.CYAN + f"Processing {file} with link {link}" + Style.RESET_ALL)
     if file and link:
         response = requests.get(link, cookies=cookies)
         if response.status_code == 200:
             target = os.path.join(folder, os.path.basename(file))
             with open(target, "wb") as f:
                 f.write(response.content)
-            logging.info(Fore.GREEN + f"Downloaded {file}")
+            logging.info(Fore.GREEN + f"Downloaded {file}" + Style.RESET_ALL)
         else:
-            logging.error(Fore.RED + f"Failed to download {file}: {response.status_code}" )
+            logging.error(Fore.RED + f"Failed to download {file}: {response.status_code}" + Style.RESET_ALL)
         
         # Add a random delay between 1 and 5 seconds
         delay = random.uniform(1, 5)
-        logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request...")
+        logging.info(Fore.YELLOW + f"Waiting for {delay:.2f} seconds before the next request..." + Style.RESET_ALL)
         time.sleep(delay)
     if link and "google.com" in link:
         file_id = get_file_id(link)
