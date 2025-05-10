@@ -41,19 +41,22 @@ def parse_link(link):
     """
     file_id = None
     if "drive.google.com" in link:
-        file_id = link.split('/')[-2]
+        if "file/d/" in link:
+            file_id = link.split('/')[-2]
+        elif "open?id=" in link:
+            file_id = link.split('=')[-1]
+        else:
+            raise ValueError("Invalid Google Drive link")
     elif "docs.google.com/presentation" in link:
         if "edit" in link:
             file_id = link.split('/')[-2]
         else:
             file_id = link.split('/')[-1]
-        return file_id
     elif "docs.google.com/document" in link:
         if "edit" in link:
             file_id = link.split('/')[-2]
         else:
             file_id = link.split('/')[-1]
-        return file_id
     else:
         raise ValueError("Invalid Google Drive link")
     return file_id
@@ -109,7 +112,7 @@ def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
         print(f'An error occurred: {error}')
 
 
-def download_file_with_id(file_id, creds):
+def download_file_with_id(file_id, creds, file_type="mp4"):
     """
     Download a Google Doc file using its file ID.
     """
@@ -117,7 +120,7 @@ def download_file_with_id(file_id, creds):
     url = f"https://www.googleapis.com/drive/v3/files/{file_id}?alt=media"
     response = requests.get(url, headers=headers, stream=True)
     if response.status_code == 200:
-        file_name = file_id + ".pdf"
+        file_name = file_id + "." + file_type
         file_path = os.path.join(os.getcwd(), "outputs", file_name)
         with open(file_path, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):

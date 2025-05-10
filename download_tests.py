@@ -19,7 +19,12 @@ class TestGoogleDownloadsLocal(unittest.TestCase):
     def test_drive_file(self):
         link = "https://drive.google.com/file/d/10TBXmYiDwyN4hIBEctfuRYDqyZyotDOn/view?usp=sharing"
         file_id = parse_link(link)
-        download_file_with_id(file_id, self.creds)
+        download_file_with_id(file_id, self.creds, "pdf")
+    
+    def test_drive_file_with_open(self):
+        link = "https://drive.google.com/open?id=1DjliLLJrZVlN_GcFcIVgEzTfLKpaeZQ8"
+        file_id = parse_link(link)
+        download_file_with_id(file_id, self.creds, "mp4")
             
     def test_docs_without_edit(self):
         link = "https://docs.google.com/document/d/1JqfsZrSlf63v__sRdMjeFUMOXpklDAWcVeQx-EOVyDo"
