@@ -15,13 +15,13 @@ def main():
     Shows basic usage of the Drive v3 API.
     Downloads a file from Google Drive.
     """
-    creds = get_creds()
+    service = create_service()
     link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
     file_id = link.split('/')[-1]
-    download_docs_with_id(file_id, creds)
+    download_docs_with_id(file_id, service)
 
 
-def get_creds():
+def create_service():
     creds = None
     # The file token.json stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -39,17 +39,16 @@ def get_creds():
         # Save the credentials for the next run
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
-    return creds
+    # Call the Drive v3 API
+    service = build('drive', 'v3', credentials=creds)
+    return service
 
 
-def download_docs_with_id(file_id, creds):
+def download_docs_with_id(file_id, service):
     """
     Download a Google Doc file using its file ID.
     """
     try:
-        # Call the Drive v3 API
-        service = build('drive', 'v3', credentials=creds)
-
         # The ID of the file you want to export
         file_metadata = service.files().get(fileId=file_id).execute()
         file_name = file_metadata.get('name')
