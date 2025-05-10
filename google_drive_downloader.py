@@ -27,7 +27,7 @@ def main():
 
     # doc_id1 = parse_link(doc_link1)
     # doc_id = parse_link(doc_link)
-    file_id = parse_link(file_link)
+    file_id = parse_google_link(file_link)
 
 
     # download_pres_with_id(doc_id, service)
@@ -35,7 +35,7 @@ def main():
     download_file_with_id(file_id, creds)
 
 
-def parse_link(link):
+def parse_google_link(link):
     """
     Parse the Google Drive link to extract the file ID.
     """
