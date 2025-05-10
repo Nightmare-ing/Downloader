@@ -1,11 +1,13 @@
 import unittest
 from google_drive_downloader import download_docs_with_id, download_file_with_id, get_file_id, create_service
+from download import setup_logging
 
 class TestGoogleDownloadsLocal(unittest.TestCase):
     def __init__(self, methodName = "runTest"):
         super().__init__(methodName)
         self.creds, self.service = create_service()
         self.storage_path = "outputs"
+        setup_logging()
 
     def test_presentation_without_edit(self):
         link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
