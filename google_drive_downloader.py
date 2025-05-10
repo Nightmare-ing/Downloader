@@ -9,6 +9,8 @@ import io
 
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
+MIMETYPES = {"pdf": "application/pdf",
+             "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation"}
 
 def main():
     """
@@ -16,6 +18,7 @@ def main():
     Downloads a file from Google Drive.
     """
     service = create_service()
+    # link = "https://docs.google.com/presentation/d/1ADK25v7v3HaATJETk5W9NSWvRA_Y18WDLsgkphWHzCI/edit?usp=share_link"
     link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
     file_id = link.split('/')[-1]
     download_docs_with_id(file_id, service)
@@ -44,7 +47,7 @@ def create_service():
     return service
 
 
-def download_docs_with_id(file_id, service):
+def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
     """
     Download a Google Doc file using its file ID.
     """
@@ -52,20 +55,21 @@ def download_docs_with_id(file_id, service):
         # The ID of the file you want to export
         file_metadata = service.files().get(fileId=file_id).execute()
         file_name = file_metadata.get('name')
-        request = service.files().export_media(fileId=file_id,
-                                               mimeType='application/vnd.openxmlformats-officedocument.presentationml.presentation')
-        file_path = os.path.join(os.getcwd(), "outputs", file_name + ".pptx")
-        fh = io.BytesIO()
-        downloader = MediaIoBaseDownload(fh, request)
-        done = False
-        while done is False:
-            status, done = downloader.next_chunk()
-            print(f"Download {int(status.progress() * 100)}%.")
-
-        # Save the file locally
-        with open(file_path, 'wb') as f:
-            f.write(fh.getvalue())
-        print(f'File downloaded as {file_path}')
+        for file_type in types:
+            request = service.files().export_media(fileId=file_id,
+                                                   mimeType=MIMETYPES[file_type])
+            file_path = os.path.join(os.getcwd(), "outputs", file_name + "." + file_type)
+            fh = io.BytesIO()
+            downloader = MediaIoBaseDownload(fh, request)
+            done = False
+            print(f"Downloading {file_name} as {file_type}...")
+            while done is False:
+                status, done = downloader.next_chunk()
+                print(f"Download {int(status.progress() * 100)}%.")
+            # Save the file locally
+            with open(file_path, 'wb') as f:
+                f.write(fh.getvalue())
+            print(f'File downloaded as {file_path}')
     except HttpError as error:
         print(f'An error occurred: {error}')
 
