@@ -110,7 +110,6 @@ def download_file_with_id(file_id, creds):
     url = f"https://www.googleapis.com/drive/v3/files/{file_id}?alt=media"
     response = requests.get(url, headers=headers, stream=True)
     if response.status_code == 200:
-        print(response.headers)
         file_name = file_id + ".pdf"
         file_path = os.path.join(os.getcwd(), "outputs", file_name)
         with open(file_path, 'wb') as f:
