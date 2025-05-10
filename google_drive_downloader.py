@@ -1,16 +1,63 @@
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.errors import HttpError
+import os.path
+import io
 
+# If modifying these SCOPES, delete the file token.json.
+SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
-gauth = GoogleAuth()
-gauth.LocalWebserverAuth()
+def main():
+    """
+    Shows basic usage of the Drive v3 API.
+    Downloads a file from Google Drive.
+    """
+    creds = None
+    # The file token.json stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'client_secrets.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
 
-drive = GoogleDrive(gauth)
+    try:
+        # Call the Drive v3 API
+        service = build('drive', 'v3', credentials=creds)
 
-# file_id = "1hdWYTHP5P7QXnVO9-RoE3iNj5QEbb9eT"
-file_id = "1TA-xr-z7df4vnJz6oo4s7OkpGLoVy1EYYTwR_8AVhxA"
-file = drive.CreateFile({"id": file_id})
+        # The ID of the file you want to export
+        link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
+        file_id = link.split('/')[-1]
+        file_metadata = service.files().get(fileId=file_id).execute()
+        file_name = file_metadata.get('name')
+        request = service.files().export_media(fileId=file_id,
+                                               mimeType='application/vnd.openxmlformats-officedocument.presentationml.presentation')
+        file_path = os.path.join(os.getcwd(), "outputs", file_name + ".pptx")
+        fh = io.BytesIO()
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+            print(f"Download {int(status.progress() * 100)}%.")
 
-# file.GetContentFile("outputs/test.mp4")
-file.GetContentFile("outputs/test.pptx")
-print("Files downloaded successfully.")
+        # Save the file locally
+        with open(file_path, 'wb') as f:
+            f.write(fh.getvalue())
+        print(f'File downloaded as {file_path}')
+    except HttpError as error:
+        print(f'An error occurred: {error}')
+
+if __name__ == '__main__':
+    main()
