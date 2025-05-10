@@ -18,7 +18,7 @@ def main():
     Shows basic usage of the Drive v3 API.
     Downloads a file from Google Drive.
     """
-    service = create_service()
+    creds, service = create_service()
     # doc_link1 = "https://docs.google.com/presentation/d/1ADK25v7v3HaATJETk5W9NSWvRA_Y18WDLsgkphWHzCI/edit?usp=share_link"
     # doc_link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
     file_link = "https://drive.google.com/file/d/10TBXmYiDwyN4hIBEctfuRYDqyZyotDOn/view?usp=sharing"
@@ -31,7 +31,7 @@ def main():
 
     # download_pres_with_id(doc_id, service)
     # download_pres_with_id(doc_id1, service)
-    download_file_with_id(file_id, os.path.join(os.getcwd(), "outputs", file_id + ".pdf"))
+    download_file_with_id(file_id, creds)
 
 
 def parse_link(link):
@@ -72,7 +72,7 @@ def create_service():
             token.write(creds.to_json())
     # Call the Drive v3 API
     service = build('drive', 'v3', credentials=creds)
-    return service
+    return creds, service
 
 
 def download_pres_with_id(file_id, service, types=["pptx", "pdf"]):
@@ -102,43 +102,24 @@ def download_pres_with_id(file_id, service, types=["pptx", "pdf"]):
         print(f'An error occurred: {error}')
 
 
-def download_file_with_id(file_id, path):
+def download_file_with_id(file_id, creds):
     """
     Download a Google Doc file using its file ID.
     """
-    URL = "https://drive.google.com/uc?export=download"
-    session = requests.Session()
-    response = session.get(URL, params={'id': file_id}, stream=True)
-    token = get_confirm_token(response)
-    
-    if token:
-        params = {'id': file_id, 'confirm': token}
-        response = session.get(URL, params=params, stream=True)
-    
-    save_response_content(response, path)
-
-
-def get_confirm_token(response):
-    """
-    Get the confirmation token from the response.
-    """
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            return value
-    return None
-
-
-def save_response_content(response, path):
-    """
-    Save the response content to a file.
-    """
-    CHUNK_SIZE = 32768
-    with open(path, "wb") as f:
-        for chunk in response.iter_content(CHUNK_SIZE):
-            if chunk:
-                f.write(chunk)
-    print(f"File downloaded to {path}")
-
+    headers = {"Authorization": "Bearer " + creds.token}
+    url = f"https://www.googleapis.com/drive/v3/files/{file_id}?alt=media"
+    response = requests.get(url, headers=headers, stream=True)
+    if response.status_code == 200:
+        print(response.headers)
+        file_name = file_id + ".pdf"
+        file_path = os.path.join(os.getcwd(), "outputs", file_name)
+        with open(file_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        print(f'File downloaded as {file_path}')
+    else:
+        print(f'An error occurred: {response.status_code}')
 
 
 if __name__ == '__main__':
