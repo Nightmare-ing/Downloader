@@ -18,10 +18,30 @@ def main():
     Downloads a file from Google Drive.
     """
     service = create_service()
-    # link = "https://docs.google.com/presentation/d/1ADK25v7v3HaATJETk5W9NSWvRA_Y18WDLsgkphWHzCI/edit?usp=share_link"
+    link1 = "https://docs.google.com/presentation/d/1ADK25v7v3HaATJETk5W9NSWvRA_Y18WDLsgkphWHzCI/edit?usp=share_link"
     link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
-    file_id = link.split('/')[-1]
+    file_id1 = parse_link(link1)
+    file_id = parse_link(link)
     download_pres_with_id(file_id, service)
+    download_pres_with_id(file_id1, service)
+
+
+def parse_link(link):
+    """
+    Parse the Google Drive link to extract the file ID.
+    """
+    file_id = None
+    if "drive.google.com" in link:
+        file_id = link.split('/')[-2]
+    elif "docs.google.com/presentation" in link:
+        if "edit" in link:
+            file_id = link.split('/')[-2]
+        else:
+            file_id = link.split('/')[-1]
+        return file_id
+    else:
+        raise ValueError("Invalid Google Drive link")
+    return file_id
 
 
 def create_service():
