@@ -82,7 +82,7 @@ def create_service():
     return creds, service
 
 
-def download_pres_with_id(file_id, service, types=["pptx", "pdf"]):
+def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
     """
     Download a Google Doc file using its file ID.
     """
