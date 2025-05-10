@@ -6,6 +6,7 @@ from googleapiclient.http import MediaIoBaseDownload
 from googleapiclient.errors import HttpError
 import os.path
 import io
+import requests
 
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
@@ -20,19 +21,17 @@ def main():
     service = create_service()
     # doc_link1 = "https://docs.google.com/presentation/d/1ADK25v7v3HaATJETk5W9NSWvRA_Y18WDLsgkphWHzCI/edit?usp=share_link"
     # doc_link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
-    file_link = "https://drive.google.com/file/d/1a23BfBZ8Dk97PBEwoTiYaM0Kw8WguVMT/view?usp=sharing"
-    file_link1 = "https://drive.google.com/file/d/1ZQleDXUF7Y_6_Faff4PtB0zmERvQ14u5/view?usp=sharing"
+    file_link = "https://drive.google.com/file/d/10TBXmYiDwyN4hIBEctfuRYDqyZyotDOn/view?usp=sharing"
+    # file_link1 = "https://drive.google.com/file/d/1ZQleDXUF7Y_6_Faff4PtB0zmERvQ14u5/view?usp=sharing"
 
     # doc_id1 = parse_link(doc_link1)
     # doc_id = parse_link(doc_link)
     file_id = parse_link(file_link)
-    file_link1 = parse_link(file_link1)
 
 
     # download_pres_with_id(doc_id, service)
     # download_pres_with_id(doc_id1, service)
-    download_file_with_id(file_id, service)
-    download_file_with_id(file_link1, service)
+    download_file_with_id(file_id, os.path.join(os.getcwd(), "outputs", file_id + ".pdf"))
 
 
 def parse_link(link):
@@ -103,29 +102,43 @@ def download_pres_with_id(file_id, service, types=["pptx", "pdf"]):
         print(f'An error occurred: {error}')
 
 
-def download_file_with_id(file_id, service):
+def download_file_with_id(file_id, path):
     """
     Download a Google Doc file using its file ID.
     """
-    try:
-        # The ID of the file you want to export
-        file_metadata = service.files().get(fileId=file_id).execute()
-        request = service.files().get_media(fileId=file_id)
-        file_name = file_metadata.get('name')
-        file_path = os.path.join(os.getcwd(), "outputs", file_name)
-        fh = io.BytesIO()
-        downloader = MediaIoBaseDownload(fh, request)
-        done = False
-        print(f"Downloading {file_name}...")
-        while done is False:
-            status, done = downloader.next_chunk()
-            print(f"Download {int(status.progress() * 100)}%.")
-        # Save the file locally
-        with open(file_path, 'wb') as f:
-            f.write(fh.getvalue())
-        print(f'File downloaded as {file_path}')
-    except HttpError as error:
-        print(f'An error occurred: {error}')
+    URL = "https://drive.google.com/uc?export=download"
+    session = requests.Session()
+    response = session.get(URL, params={'id': file_id}, stream=True)
+    token = get_confirm_token(response)
+    
+    if token:
+        params = {'id': file_id, 'confirm': token}
+        response = session.get(URL, params=params, stream=True)
+    
+    save_response_content(response, path)
+
+
+def get_confirm_token(response):
+    """
+    Get the confirmation token from the response.
+    """
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+    return None
+
+
+def save_response_content(response, path):
+    """
+    Save the response content to a file.
+    """
+    CHUNK_SIZE = 32768
+    with open(path, "wb") as f:
+        for chunk in response.iter_content(CHUNK_SIZE):
+            if chunk:
+                f.write(chunk)
+    print(f"File downloaded to {path}")
+
 
 
 if __name__ == '__main__':
