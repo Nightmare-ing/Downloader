@@ -7,6 +7,7 @@ from googleapiclient.errors import HttpError
 import os.path
 import io
 import requests
+import logging
 
 # If modifying these SCOPES, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
@@ -46,9 +47,9 @@ def get_file_id(link):
         elif "open?id=" in link:
             file_id = link.split('=')[-1]
         elif "folders" in link:
-            raise ValueError("Invalid Google Drive link: Folder links are not supported")
+            logging.error("Google Drive folder links: {link} are not supported.")
         else:
-            raise ValueError("Invalid Google Drive link")
+            logging.error("Invalid Google Drive link: {link}.")
     elif "docs.google.com/presentation" in link:
         if "edit" in link:
             file_id = link.split('/')[-2]
@@ -60,7 +61,7 @@ def get_file_id(link):
         else:
             file_id = link.split('/')[-1]
     else:
-        raise ValueError("Invalid Google Drive link")
+        logging.error("Invalid Google Docs link: {link}.")
     return file_id
 
 
@@ -102,16 +103,16 @@ def download_docs_with_id(storage_path, file_id, service, types=["pptx", "pdf"])
             fh = io.BytesIO()
             downloader = MediaIoBaseDownload(fh, request)
             done = False
-            print(f"Downloading {file_name} as {file_type}...")
+            logging.info(f"Downloading {file_name} as {file_type}...")
             while done is False:
                 status, done = downloader.next_chunk()
-                print(f"Download {int(status.progress() * 100)}%.")
+                logging.info(f"Download {int(status.progress() * 100)}%.")
             # Save the file locally
             with open(file_path, 'wb') as f:
                 f.write(fh.getvalue())
-            print(f'File downloaded as {file_path}')
+            logging.info(f"File downloaded as {file_path}")
     except HttpError as error:
-        print(f'An error occurred: {error}')
+        logging.error(f"An error occurred: {error}")
 
 
 def download_file_with_id(storage_path, file_id, creds, file_type="pdf"):
@@ -128,9 +129,9 @@ def download_file_with_id(storage_path, file_id, creds, file_type="pdf"):
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:
                     f.write(chunk)
-        print(f'File downloaded as {file_path}')
+        logging.info(f"File downloaded as {file_path}")
     else:
-        print(f'An error occurred: {response.status_code}')
+        logging.error(f"An error occurred: {response.status_code}")
 
 
 if __name__ == '__main__':
