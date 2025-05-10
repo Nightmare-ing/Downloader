@@ -21,7 +21,7 @@ def main():
     # link = "https://docs.google.com/presentation/d/1ADK25v7v3HaATJETk5W9NSWvRA_Y18WDLsgkphWHzCI/edit?usp=share_link"
     link = "https://docs.google.com/presentation/d/1hRUkaONWvWP7IZbINLP-G6uOyyulDqury5kop7638co"
     file_id = link.split('/')[-1]
-    download_docs_with_id(file_id, service)
+    download_pres_with_id(file_id, service)
 
 
 def create_service():
@@ -47,7 +47,7 @@ def create_service():
     return service
 
 
-def download_docs_with_id(file_id, service, types=["pptx", "pdf"]):
+def download_pres_with_id(file_id, service, types=["pptx", "pdf"]):
     """
     Download a Google Doc file using its file ID.
     """
