@@ -25,6 +25,8 @@ def main():
     init(autoreset=True)  # Initialize colorama with auto-reset
     setup_logging()  # Set up logging
     args = parse_args()
+    creds, service = create_service()  # Create Google Drive service and credentials
+
     QCoreApplication.setApplicationName("Link Downloader")
     app = QApplication(sys.argv)
     login_url = args.url  # Get the login URL from command line arguments
@@ -34,10 +36,10 @@ def main():
     config_file_src = args.file
     if os.path.isdir(config_file_src):
         file_batches_dir = config_file_src
-        browser.cookies_ready.connect(lambda cookies: batch_download(cookies, file_batches_dir, download_dir))
+        browser.cookies_ready.connect(lambda cookies: batch_download(service, creds, cookies, file_batches_dir, download_dir))
     else:
         links_file = config_file_src
-        browser.cookies_ready.connect(lambda cookies: single_download(cookies, links_file, download_dir))
+        browser.cookies_ready.connect(lambda cookies: single_download(service, creds, cookies, links_file, download_dir))
     sys.exit(app.exec_())
 
 
@@ -72,7 +74,7 @@ def parse_args():
     return parser.parse_args()
     
 
-def single_download(cookies, links_file, download_dir):
+def single_download(service, creds, cookies, links_file, download_dir):
     """
     Use cookies to download protected data described in a CSV or YML file.
     :param cookies: The cookies to use for the download.
@@ -82,14 +84,14 @@ def single_download(cookies, links_file, download_dir):
     if links_file.endswith(".csv"):
         parse_csv(cookies, links_file, download_dir)
     elif links_file.endswith(".yml") or links_file.endswith(".yaml"):
-        parse_yml(cookies, links_file, download_dir)
+        parse_yml(service, creds, cookies, links_file, download_dir)
     else:
         logging.error(Fore.RED + "Unsupported file format. Please provide a CSV or YML file." + Style.RESET_ALL)
         sys.exit(1)
     after_download()
 
     
-def batch_download(cookies, input_dir, output_dir):
+def batch_download(service, creds, cookies, input_dir, output_dir):
     """
     Download according to all files in the input directory and save them to the output directory.
     :param cookies: The cookies use for downloading.
@@ -104,7 +106,7 @@ def batch_download(cookies, input_dir, output_dir):
             else:
                 config_file_name = os.path.splitext(conifg_file)[0]
                 download_dir = os.path.join(output_dir, config_file_name)
-                parse_yml(cookies, config_file_path, download_dir)
+                parse_yml(service, creds, cookies, config_file_path, download_dir)
     after_download()
 
 
