@@ -44,6 +44,8 @@ class TestGoogleDownloadsProxy(unittest.TestCase):
     def __init__(self, methodName = "runTest"):
         super().__init__(methodName)
         self.creds, self.service = create_service()
+        self.storage_path = "outputs"
+        setup_logging()
 
     def test_presentation_without_edit(self):
         link = "https://docs.google.com/presentation/d/1ELBsq-eVk7NzsDu_FubqYsp9qytiYaA8UXt0dc9X57c"
