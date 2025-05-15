@@ -97,7 +97,7 @@ def gen_yml_with_src(links_src, folder):
                 continue
             if line.startswith("# NEED HELP!"):
                 url = line.replace("# NEED HELP! ", "").strip()
-                if "https://inst.eecs.berkeley.edu" in url or "http://inst.eecs.berkeley.edu" in url:
+                if "https://inst.eecs.berkeley.edu" in url or "http://inst.eecs.berkeley.edu" in url or "www.inst.eecs.berkeley.edu" in url:
                     file_name = extract_file_name(url)
                 elif "google.com" in line:
                     file_name = ""
