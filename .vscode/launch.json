@@ -11,6 +11,15 @@
             "program": "${workspaceFolder}/downloader.py",
             "console": "integratedTerminal",
             "args": "-f inputs/inputs/input_test -u https://github.com"
+        },
+        {
+            "name": "Python Debugger: download_tests.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": "-m unittest download_tests.TestGoogleDownloadsProxy"
         }
     ]
 }
